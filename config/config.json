@@ -1,0 +1,16 @@
+{
+  "debug": true,
+  "server": {
+    "address": ":9090"
+  },
+  "context":{
+    "timeout":2
+  },
+  "database": {
+    "host": "localhost",
+    "port": "1234",
+    "user": "dbuser",
+    "pass": "dbpassword",
+    "name": "dbname"
+  }
+}

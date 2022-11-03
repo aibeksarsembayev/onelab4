@@ -6,12 +6,14 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	config "github.com/aibeksarsembayev/onelab/tasks/lab4/config"
-	_userHttpDelivery "github.com/aibeksarsembayev/onelab/tasks/lab4/user/handlers/http"
-	_userRepo "github.com/aibeksarsembayev/onelab/tasks/lab4/user/repository"
-	_userUsecase "github.com/aibeksarsembayev/onelab/tasks/lab4/user/usecases"
+	_userHttpDelivery "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/handlers/http"
+	_userRepo "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/repository"
+	"github.com/aibeksarsembayev/onelab/tasks/lab4/internal/repository/postgres"
+	_userUsecase "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/usecases"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -26,6 +28,11 @@ func main() {
 	}
 
 	// create pool of connection for DB
+	dbpool, err := postgres.InitPostgresDBConn(&conf)
+	if err != nil {
+		log.Fatalf("database: %v", err)
+	}
+	defer dbpool.Close()
 
 	// initialize echo server
 	e := echo.New()
@@ -34,7 +41,7 @@ func main() {
 	e.Use(middleware.Logger())
 
 	// initialize repos
-	userRepo := _userRepo.NewDBUserRepository() // pass DB conn
+	userRepo := _userRepo.NewDBUserRepository(dbpool)
 
 	// set context timeout
 	timeoutContext := time.Duration(conf.Context.Timeout) * time.Second

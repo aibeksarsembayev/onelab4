@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	httpdelivery "github.com/aibeksarsembayev/onelab/tasks/lab4/user/handlers/http"
-	_userRepo "github.com/aibeksarsembayev/onelab/tasks/lab4/user/repository"
-	_userUsecase "github.com/aibeksarsembayev/onelab/tasks/lab4/user/usecases"
+	httpdelivery "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/handlers/http"
+	_userRepo "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/repository"
+	_userUsecase "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/usecases"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )

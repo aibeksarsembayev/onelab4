@@ -6,15 +6,18 @@ import (
 	"time"
 
 	"github.com/aibeksarsembayev/onelab/tasks/lab4/domain"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type dbUserRepository struct {
-	// Conn
+	dbpool *pgxpool.Pool
 }
 
 // NewDBUserRepository ...
-func NewDBUserRepository() domain.UserRepository {
-	return &dbUserRepository{}
+func NewDBUserRepository(dbpool *pgxpool.Pool) domain.UserRepository {
+	return &dbUserRepository{
+		dbpool: dbpool,
+	}
 }
 
 // Create user in db ...

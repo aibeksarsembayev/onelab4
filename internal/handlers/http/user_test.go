@@ -1,6 +1,7 @@
 package httpdelivery_test
 
 import (
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -10,7 +11,9 @@ import (
 
 	httpdelivery "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/handlers/http"
 	_userRepo "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/repository"
+	"github.com/aibeksarsembayev/onelab/tasks/lab4/internal/repository/postgres"
 	_userUsecase "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/usecases"
+
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -33,7 +36,12 @@ func TestCreate(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	// initialize repos. 	// set context timeout and initialize usecases
-	userRepo := _userRepo.NewDBUserRepository() // pass DB conn
+	dbpool, err := postgres.InitPostgresDBConn(&conf)
+	if err != nil {
+		log.Fatalf("database: %v", err)
+	}
+	defer dbpool.Close()
+	userRepo := _userRepo.NewDBUserRepository(dbpool) // pass DB conn
 	timeoutContext := 2 * time.Second
 	uUsecase := _userUsecase.NewUserUsecase(userRepo, timeoutContext)
 	// handler

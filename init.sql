@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS "user"(
+  "id" BIGSERIAL PRIMARY KEY,
+  "name" TEXT NOT NULL,
+  "surname" TEXT NOT NULL,
+  "email" TEXT NOT NULL UNIQUE,
+  "status" BOOLEAN NOT NULL,
+  "created_at" TIMESTAMP NOT NULL
+);

@@ -2,7 +2,7 @@ run-nodocker:
 	go run ./cmd
 
 build:
-	docker build -t icrudtmpl:multistage -f Dockerfile.multistage .
+	docker build -t icrudtmpl:multistage -f Dockerfile .
 	docker image prune
 
 run:

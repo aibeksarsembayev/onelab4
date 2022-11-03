@@ -48,7 +48,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         context: ./
-        file: ./Dockerfile.multistage
+        file: ./Dockerfile
         builder: ${{ steps.buildx.outputs.name }}
         push: true
         # tags: ${{ secrets.DOCKER_HUB_USERNAME }}/onelab4:latest

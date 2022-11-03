@@ -1,6 +1,7 @@
 package httpdelivery_test
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -9,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aibeksarsembayev/onelab/tasks/lab4/config"
 	httpdelivery "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/handlers/http"
 	_userRepo "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/repository"
 	"github.com/aibeksarsembayev/onelab/tasks/lab4/internal/repository/postgres"
@@ -36,6 +38,13 @@ func TestCreate(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	// initialize repos. 	// set context timeout and initialize usecases
+	// load configs
+	conf, err := config.LoadConfig()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(conf)
+	}
 	dbpool, err := postgres.InitPostgresDBConn(&conf)
 	if err != nil {
 		log.Fatalf("database: %v", err)

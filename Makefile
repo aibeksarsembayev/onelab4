@@ -1,8 +1,12 @@
+build:
+	docker-compose build
+	docker image prune
+
 run:
-	docker-compose up
+	docker-compose up -d
 	
 stop:
-	docker-compose down
+	docker-compose down -v
 
 delete:
 	docker rmi postgres:latest golang:1.19 alpine:latest onelab4_app:latest

@@ -47,7 +47,7 @@ func (uh *UserHandler) GetByID(c echo.Context) error {
 	// get user id
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, ResponceError{Message: "wrong id"})
 	}
 	// get user from db
 	user, err := uh.UserUsecase.GetByID(c.Request().Context(), id)
@@ -80,7 +80,7 @@ func (uh *UserHandler) Update(c echo.Context) error {
 	// get id from url
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, ResponceError{Message: "wrong id"})
 	}
 	// user info bind from form
 	user := new(domain.UserRequestDTO)
@@ -109,7 +109,7 @@ func (uh *UserHandler) Update(c echo.Context) error {
 func (uh *UserHandler) Delete(c echo.Context) error {
 	id, err := strconv.Atoi(c.QueryParam("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, ResponceError{Message: "wrong id"})
 	}
 	err = uh.UserUsecase.Delete(c.Request().Context(), id)
 	if err != nil {

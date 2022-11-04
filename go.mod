@@ -3,6 +3,7 @@ module github.com/aibeksarsembayev/onelab/tasks/lab4
 go 1.18
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v5 v5.0.4
 	github.com/jmoiron/sqlx v1.3.5

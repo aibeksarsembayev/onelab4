@@ -1,8 +1,6 @@
 package httpdelivery_test
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -10,11 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/aibeksarsembayev/onelab/tasks/lab4/config"
+	"github.com/DATA-DOG/go-sqlmock"
 	httpdelivery "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/handlers/http"
 	_userRepo "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/repository"
-	"github.com/aibeksarsembayev/onelab/tasks/lab4/internal/repository/postgres"
 	_userUsecase "github.com/aibeksarsembayev/onelab/tasks/lab4/internal/usecases"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -38,19 +36,29 @@ func TestCreate(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	// initialize repos. 	// set context timeout and initialize usecases
+
 	// load configs
-	conf, err := config.LoadConfig()
+	// conf, err := config.LoadConfig()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	fmt.Println(conf)
+	// }
+
+	// dbpool, err := postgres.InitPostgresDBConn(&conf)
+	// if err != nil {
+	// 	log.Fatalf("database: %v", err)
+	// }
+	// defer dbpool.Close()
+
+	mockDB, _, err := sqlmock.New()
 	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(conf)
+		t.Errorf("an error '%s' was not expected when opening a stub database connection", err)
 	}
-	dbpool, err := postgres.InitPostgresDBConn(&conf)
-	if err != nil {
-		log.Fatalf("database: %v", err)
-	}
-	defer dbpool.Close()
-	userRepo := _userRepo.NewDBUserRepository(dbpool) // pass DB conn
+	defer mockDB.Close()
+	sqlxDB := sqlx.NewDb(mockDB, "sqlmock")
+
+	userRepo := _userRepo.NewDBUserRepository(sqlxDB) // pass DB conn
 	timeoutContext := 2 * time.Second
 	uUsecase := _userUsecase.NewUserUsecase(userRepo, timeoutContext)
 	// handler

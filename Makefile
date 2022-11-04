@@ -1,14 +1,21 @@
-run-nodocker:
-	go run ./cmd
-
-build:
-	docker build -t icrudtmpl:multistage -f Dockerfile .
-	docker image prune
-
 run:
-	docker run -d -p 8080:9090 --rm --name ccrudtmpl icrudtmpl:multistage
-
+	docker-compose up
+	
 stop:
-	docker stop ccrudtmpl
+	docker-compose down
 
-.DEFAULT_GOAL := build
+delete:
+	docker rmi postgres:latest golang:1.19 alpine:latest onelab4_app:latest
+
+
+# build:
+# 	docker build -t icrudtmpl:multistage -f Dockerfile .
+# 	docker image prune
+
+# run:
+# 	docker run -d -p 8080:8080 --rm --name ccrudtmpl icrudtmpl:multistage
+
+# stop:
+# 	docker stop ccrudtmpl
+
+.DEFAULT_GOAL := run

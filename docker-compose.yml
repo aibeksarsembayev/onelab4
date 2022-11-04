@@ -16,7 +16,7 @@ services:
     tty: true
     build: .
     ports:
-      - '8080:9090'
+      - '8080:8080'
     restart: on-failure
     volumes:
       - .:/app

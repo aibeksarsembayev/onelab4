@@ -2,19 +2,19 @@ package db
 
 import (
 	"context"
-	"errors"
-	"time"
+	"strings"
 
 	"github.com/aibeksarsembayev/onelab/tasks/lab4/domain"
-	"github.com/jackc/pgx/v5/pgxpool"
+	_ "github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jmoiron/sqlx"
 )
 
 type dbUserRepository struct {
-	dbpool *pgxpool.Pool
+	dbpool *sqlx.DB
 }
 
 // NewDBUserRepository ...
-func NewDBUserRepository(dbpool *pgxpool.Pool) domain.UserRepository {
+func NewDBUserRepository(dbpool *sqlx.DB) domain.UserRepository {
 	return &dbUserRepository{
 		dbpool: dbpool,
 	}
@@ -22,66 +22,62 @@ func NewDBUserRepository(dbpool *pgxpool.Pool) domain.UserRepository {
 
 // Create user in db ...
 func (db *dbUserRepository) Create(ctx context.Context, user *domain.User) error {
-	// Insert in db
+	_, err := db.dbpool.NamedExec(`INSERT INTO "user" (name, surname, email, status, created_at) VALUES (:name, :surname, :email, :status, :created_at)`, &user)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 // Get user by ID from db ...
 func (db *dbUserRepository) GetByID(ctx context.Context, id int) (domain.User, error) {
-	// Select from db by id
-	if id == 1 {
-		user := domain.User{
-			ID:      id,
-			Name:    "Leela",
-			Surname: "Turanga",
-			Email:   "one@eye.com",
-			Status:  false,
-		}
-		return user, nil
-	} else {
-		err := errors.New("no record")
+	user := domain.User{}
+	err := db.dbpool.Get(&user, `SELECT * FROM "user" WHERE "id"=$1`, id)
+	if err != nil {
 		return domain.User{}, err
 	}
+	return user, nil
 }
 
 // Get all users from db ..
 func (db *dbUserRepository) GetAll(ctx context.Context) ([]domain.User, error) {
-	users := []domain.User{
-		{
-			ID:        0,
-			Name:      "bender",
-			Surname:   "unknown",
-			Email:     "r3000@m.com",
-			Status:    true,
-			CreatedAt: time.Now().Add(1000 * time.Hour),
-		},
-		{
-			ID:        1,
-			Name:      "Leela",
-			Surname:   "Turanga",
-			Email:     "one@eye.com",
-			Status:    false,
-			CreatedAt: time.Now().Add(9999 * time.Hour)},
+	users := []domain.User{}
+	err := db.dbpool.Select(&users, `SELECT * FROM "user" ORDER by id ASC`)
+
+	if err != nil {
+		return []domain.User{}, err
 	}
 	return users, nil
 }
 
 // Update user in db
 func (db *dbUserRepository) Update(ctx context.Context, user *domain.User) error {
-	if user.ID == 1 {
-		return nil
-	} else {
-		err := errors.New("no record")
+	_, err := db.GetByID(ctx, user.ID)
+	if err != nil {
+		if strings.Contains(err.Error(), "no rows in result set") {
+			return err
+		}
+	}
+
+	_, err = db.dbpool.NamedExec(`UPDATE "user" SET (name, surname, email, status) = (:name, :surname, :email, :status) WHERE "id" = :id`, user)
+	if err != nil {
 		return err
 	}
+	return nil
 }
 
 // Delete user by id in db
 func (db *dbUserRepository) Delete(ctx context.Context, id int) error {
-	if id == 1 {
-		return nil
-	} else {
-		err := errors.New("no record")
+	_, err := db.GetByID(ctx, id)
+	if err != nil {
+		if strings.Contains(err.Error(), "no rows in result set") {
+			return err
+		}
+	}
+
+	_, err = db.dbpool.Exec(`DELETE FROM "user" WHERE "id" = $1`, id)
+	if err != nil {
 		return err
 	}
+	return nil
 }

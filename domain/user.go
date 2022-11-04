@@ -7,12 +7,12 @@ import (
 
 // User struct ...
 type User struct {
-	ID        int       `json:"id"`
-	Name      string    `json:"name"`
-	Surname   string    `json:"surname"`
-	Email     string    `json:"email"`
-	Status    bool      `json:"status"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        int       `json:"id" db:"id"`
+	Name      string    `json:"name" db:"name"`
+	Surname   string    `json:"surname" db:"surname"`
+	Email     string    `json:"email" db:"email"`
+	Status    bool      `json:"status" db:"status"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
 }
 
 // UserRequestDTO ...

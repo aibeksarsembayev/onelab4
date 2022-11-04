@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/aibeksarsembayev/onelab/tasks/lab4/domain"
@@ -32,7 +33,11 @@ func (uh *UserHandler) Create(c echo.Context) error {
 	}
 	err := uh.UserUsecase.Create(c.Request().Context(), &us)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		if strings.Contains(err.Error(), "unique constraint") {
+			return c.JSON(http.StatusBadRequest, ResponceError{Message: "user already exists"})
+		} else {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
 	}
 	return c.JSON(http.StatusCreated, user)
 }
@@ -48,7 +53,7 @@ func (uh *UserHandler) GetByID(c echo.Context) error {
 	user, err := uh.UserUsecase.GetByID(c.Request().Context(), id)
 	if err != nil {
 		fmt.Println(err.Error() == "no record")
-		if err.Error() == "no record" {
+		if strings.Contains(err.Error(), "no rows in result set") {
 			return c.JSON(http.StatusNotFound, ResponceError{Message: "no user with given id"})
 		} else {
 			return c.JSON(http.StatusInternalServerError, err)
@@ -62,6 +67,9 @@ func (uh *UserHandler) GetAll(c echo.Context) error {
 	users, err := uh.UserUsecase.GetAll(c.Request().Context())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
+	}
+	if len(users) == 0 {
+		return c.JSON(http.StatusNotFound, ResponceError{Message: "no users"})
 	}
 
 	return c.JSON(http.StatusOK, users)
@@ -88,7 +96,7 @@ func (uh *UserHandler) Update(c echo.Context) error {
 	}
 	err = uh.UserUsecase.Update(context.Background(), &us)
 	if err != nil {
-		if err.Error() == "no record" {
+		if strings.Contains(err.Error(), "no rows in result set") {
 			return c.JSON(http.StatusNotFound, ResponceError{Message: "no user with given id"})
 		} else {
 			return c.JSON(http.StatusInternalServerError, err)
@@ -106,7 +114,7 @@ func (uh *UserHandler) Delete(c echo.Context) error {
 	err = uh.UserUsecase.Delete(c.Request().Context(), id)
 	if err != nil {
 		if err != nil {
-			if err.Error() == "no record" {
+			if strings.Contains(err.Error(), "no rows in result set") {
 				return c.JSON(http.StatusNotFound, ResponceError{Message: "no user with given id"})
 			} else {
 				return c.JSON(http.StatusInternalServerError, err)
